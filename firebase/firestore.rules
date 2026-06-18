@@ -1,0 +1,21 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /users/{userId} {
+      allow read, write: if request.auth.uid == userId;
+    }
+    match /submissions/{submissionId} {
+      allow create: if request.auth != null;
+      allow read: if request.auth.uid == resource.data.userId
+                  || request.auth.token.role == 'officer';
+      allow update: if request.auth.token.role == 'officer';
+    }
+    match /visit_logs/{logId} {
+      allow read, write: if request.auth.token.role == 'officer';
+    }
+    match /ai_results/{docId} {
+      allow read: if request.auth != null;
+      allow write: if false;
+    }
+  }
+}
