@@ -1,6 +1,8 @@
 """
 Demo analyser — derives realistic compliance extraction from submitted form data.
-Switch to real Claude Vision by setting USE_REAL_AI=true in .env.
+For new_building submissions: uses the OpenCV CV engine (civguard_compliance.py)
+  when backend/assets/ reference files are present; otherwise falls back to demo mode.
+Switch to real Claude Vision for all types by setting USE_REAL_AI=true in .env.
 """
 
 import os
@@ -13,13 +15,31 @@ USE_REAL_AI = os.environ.get("USE_REAL_AI", "false").lower() == "true"
 def analyse_blueprint(file_bytes: bytes, file_type: str, form_data: dict) -> dict:
     if USE_REAL_AI:
         return _analyse_with_claude(file_bytes, file_type, form_data)
+
+    sub_type = (form_data.get("submission_type") or "").lower()
+    if sub_type == "new_building":
+        return _analyse_new_building_cv(file_bytes, file_type, form_data)
+
     return _analyse_demo(form_data)
 
 
-# ---------------------------------------------------------------------------
-# Demo mode
-# ---------------------------------------------------------------------------
+# ──────────────────────────────────────────────────────
+# NEW BUILDING — OpenCV compliance engine
+# ──────────────────────────────────────────────────────
+def _analyse_new_building_cv(file_bytes: bytes, file_type: str, form_data: dict) -> dict:
+    try:
+        from cv_analyser import analyse_new_building, MissingAssetsError
+        return analyse_new_building(file_bytes, file_type, form_data)
+    except Exception as e:
+        # Log the reason so the developer knows whether to place assets
+        import traceback; traceback.print_exc()
+        print(f"[CV analyser] Falling back to demo mode: {e}")
+        return _analyse_demo(form_data)
 
+
+# ──────────────────────────────────────────────────────
+# DEMO MODE (shop / fit-out, or new_building fallback)
+# ──────────────────────────────────────────────────────
 def _analyse_demo(form_data: dict) -> dict:
     floor_count    = _num(form_data.get("number_of_floors") or form_data.get("floor_number"), 2)
     building_height = _num(form_data.get("building_height_m"), floor_count * 3.5)
@@ -27,75 +47,66 @@ def _analyse_demo(form_data: dict) -> dict:
     occupancy      = _num(form_data.get("estimated_occupancy"), 30)
     sprinklered    = str(form_data.get("sprinklered", "false")).lower() in ("true", "1", "yes")
 
-    # ---------- derive realistic (sometimes failing) values ----------
-
     # Exit width: small units often have narrow doors
     if total_area < 100:
-        exit_widths = [random.choice([800, 850, 900, 950])]   # may fail
+        exit_widths = [random.choice([800, 850, 900, 950])]
     elif total_area < 300:
         exit_widths = [random.choice([900, 950, 1000]), 1000]
     else:
         exit_widths = [1000, 1100, 1200]
 
-    # Exit count: single-exit shops often fail
+    # Exit count
     if occupancy <= 50 and total_area <= 93:
-        exit_count = 1          # marginal — may fail rule 2
+        exit_count = 1
     elif occupancy <= 100:
         exit_count = 2
     else:
         exit_count = 3
 
-    # Corridor width: older fit-outs often too narrow
+    # Corridor width
     if total_area < 150:
         corridor_widths = [random.choice([900, 1000, 1100, 1200, 1300])]
     else:
         corridor_widths = [1200, 1400]
 
-    # Travel distance: large open-plan spaces can exceed limits
-    max_travel = total_area / (exit_count * 2.5)
-    max_travel = round(min(max_travel, 70), 1)
+    max_travel = round(min(total_area / (exit_count * 2.5), 70), 1)
 
-    # Sprinkler: required if ≥3 floors or ≥14 m — use actual form values
     needs_sprinkler = floor_count >= 3 or building_height >= 14
-    has_sprinkler   = sprinklered or needs_sprinkler  # if required, assume present unless user said no
+    has_sprinkler   = sprinklered or needs_sprinkler
 
-    # Smoke detector coverage
     detector_coverage = round(total_area / max(1, int(total_area / 55)), 1)
-
-    # Extinguisher
     ext_count    = max(1, int(total_area / 200))
     ext_distance = round(total_area / (ext_count * 4), 1)
 
-    # Fire truck access: site plans often missing from shop submissions
     sub_type = form_data.get("submission_type", "")
-    truck_access = 5.0 if sub_type == "new_building" else None   # shops → unverifiable
+    truck_access = 5.0 if sub_type == "new_building" else None
 
     extracted = {
-        "building_height_m":            building_height,
-        "floor_count":                  floor_count,
-        "total_floor_area_m2":          total_area,
-        "estimated_occupancy":          occupancy,
-        "exit_count":                   exit_count,
-        "exit_widths_mm":               exit_widths,
-        "corridor_widths_mm":           corridor_widths,
-        "staircase_widths_mm":          [1200] if floor_count > 1 else None,
-        "max_travel_distance_m":        max_travel,
-        "dead_end_length_m":            round(random.uniform(2, 7), 1),
-        "has_sprinkler_system":         has_sprinkler,
+        "building_height_m":              building_height,
+        "floor_count":                    floor_count,
+        "total_floor_area_m2":            total_area,
+        "estimated_occupancy":            occupancy,
+        "exit_count":                     exit_count,
+        "exit_widths_mm":                 exit_widths,
+        "corridor_widths_mm":             corridor_widths,
+        "staircase_widths_mm":            [1200] if floor_count > 1 else None,
+        "max_travel_distance_m":          max_travel,
+        "dead_end_length_m":              round(random.uniform(2, 7), 1),
+        "has_sprinkler_system":           has_sprinkler,
         "sprinkler_coverage_m2_per_head": 11.5 if has_sprinkler else None,
-        "smoke_detector_count":         max(1, int(total_area / 50)),
-        "smoke_detector_coverage_m2":   detector_coverage,
-        "fire_extinguisher_count":      ext_count,
+        "smoke_detector_count":           max(1, int(total_area / 50)),
+        "smoke_detector_coverage_m2":     detector_coverage,
+        "fire_extinguisher_count":        ext_count,
         "max_distance_to_extinguisher_m": ext_distance,
-        "fire_hose_reel_present":       floor_count >= 2,
-        "emergency_lighting_present":   random.choice([True, True, True, False]),
-        "exit_signs_present":           True,
-        "fire_truck_access_width_m":    truck_access,
-        "nearest_hydrant_distance_m":   round(random.uniform(30, 120), 1),
-        "assembly_point_marked":        sub_type == "new_building",
-        "fire_compartment_max_area_m2": min(total_area, 1800),
-        "fire_door_ratings_present":    floor_count >= 2,
-        "page_notes":                   _page_notes(form_data),
+        "fire_hose_reel_present":         floor_count >= 2,
+        "emergency_lighting_present":     random.choice([True, True, True, False]),
+        "exit_signs_present":             True,
+        "fire_truck_access_width_m":      truck_access,
+        "nearest_hydrant_distance_m":     round(random.uniform(30, 120), 1),
+        "assembly_point_marked":          sub_type == "new_building",
+        "fire_compartment_max_area_m2":   min(total_area, 1800),
+        "fire_door_ratings_present":      floor_count >= 2,
+        "page_notes":                     _page_notes(form_data),
     }
 
     result = check_compliance(extracted, form_data)
@@ -114,12 +125,11 @@ def _page_notes(form_data: dict) -> str:
 
 
 def _summary(result: dict, form_data: dict) -> str:
-    verdict   = result["overall_result"]
-    passes    = result["pass_count"]
-    failures  = result["fail_count"]
-    critical  = result["critical_failures"]
-    unverif   = result["unverifiable_count"]
-    name      = form_data.get("project_name") or form_data.get("shop_name") or "The submitted property"
+    verdict  = result["overall_result"]
+    passes   = result["pass_count"]
+    critical = result["critical_failures"]
+    unverif  = result["unverifiable_count"]
+    name     = form_data.get("project_name") or form_data.get("shop_name") or "The submitted property"
 
     if verdict == "approved":
         return (
@@ -136,8 +146,7 @@ def _summary(result: dict, form_data: dict) -> str:
             f"{name} has {critical} critical compliance failure(s) under the UAE Fire and Life Safety Code "
             f"({passes}/10 rules passed). "
             f"Key issues identified: {failed_str}. "
-            f"All CRITICAL items must be corrected and resubmitted before approval can be granted. "
-            f"Please refer to the detailed checklist below for specific requirements."
+            f"All CRITICAL items must be corrected and resubmitted before approval can be granted."
         )
 
 
@@ -148,10 +157,9 @@ def _num(val, default):
         return float(default)
 
 
-# ---------------------------------------------------------------------------
-# Real AI mode (Claude Vision) — enabled with USE_REAL_AI=true in .env
-# ---------------------------------------------------------------------------
-
+# ──────────────────────────────────────────────────────
+# REAL AI MODE — enabled with USE_REAL_AI=true in .env
+# ──────────────────────────────────────────────────────
 def _analyse_with_claude(file_bytes: bytes, file_type: str, form_data: dict) -> dict:
     import json
     import anthropic

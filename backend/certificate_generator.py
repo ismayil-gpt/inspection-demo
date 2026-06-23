@@ -1,10 +1,11 @@
 import io
+import base64
 from datetime import datetime, timezone
 from reportlab.lib.pagesizes import A4
 from reportlab.lib import colors
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.lib.units import mm, cm
-from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle, HRFlowable
+from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle, HRFlowable, Image
 from reportlab.lib.enums import TA_CENTER, TA_LEFT
 
 
@@ -156,6 +157,31 @@ def generate_rejection_report(submission_id: str, form_data: dict, ai_result: di
             if check.get("notes"):
                 story.append(Paragraph(check["notes"], ParagraphStyle('item_n', fontSize=9,
                                                                         leftIndent=12, textColor=colors.HexColor('#555555'), spaceAfter=6)))
+
+    # Annotated floor plan image (CV engine output — present for new_building submissions)
+    annotated_b64 = ai_result.get("annotated_image_base64")
+    if annotated_b64:
+        story.append(Spacer(1, 0.4*cm))
+        story.append(Paragraph("Annotated Floor Plan — Detected Issues",
+                                ParagraphStyle('h2', fontSize=12, fontName='Helvetica-Bold', spaceAfter=4)))
+        story.append(Paragraph(
+            "The image below shows the AI-annotated floor plan. "
+            "Green boxes indicate detected fire-safety symbols. "
+            "Red dashed boxes indicate missing or undetected symbols. "
+            "Orange highlights show quadrant-level compliance warnings.",
+            ParagraphStyle('img_caption', fontSize=9, textColor=colors.HexColor('#555555'), spaceAfter=6)
+        ))
+        try:
+            img_bytes = base64.b64decode(annotated_b64)
+            img_buf   = io.BytesIO(img_bytes)
+            # Fit within the page width (17 cm), keep aspect ratio
+            page_w = A4[0] - 4*cm   # usable width
+            img_flowable = Image(img_buf, width=page_w, height=page_w * 0.63)
+            img_flowable.hAlign = 'CENTER'
+            story.append(img_flowable)
+        except Exception:
+            story.append(Paragraph("(Annotated image could not be embedded.)",
+                                    ParagraphStyle('err', fontSize=8, textColor=colors.HexColor('#999999'))))
 
     story.append(Spacer(1, 0.5*cm))
     story.append(HRFlowable(width="100%", thickness=1, color=colors.HexColor('#CCCCCC')))

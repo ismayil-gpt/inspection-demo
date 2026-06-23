@@ -52,13 +52,21 @@ async def analyse(
         result = analyse_blueprint(file_bytes, file_type, parsed_form)
         result["processing_time_s"] = round(time.time() - start, 2)
 
-        # Generate PDF certificate/report and include as base64 in response
+        # Generate PDF certificate/report (annotated image stays in result for rejection PDF)
         if result["overall_result"] == "approved":
+            # Strip annotated image before approval cert — not needed there
+            result.pop("annotated_image_base64", None)
             pdf_bytes = generate_approval_certificate(submission_id, parsed_form, result)
             result["certificate_pdf_base64"] = base64.b64encode(pdf_bytes).decode("utf-8")
         else:
+            # Keep annotated image in result so the rejection report can embed it,
+            # then strip it out after PDF generation (too large for Firestore)
             pdf_bytes = generate_rejection_report(submission_id, parsed_form, result)
             result["report_pdf_base64"] = base64.b64encode(pdf_bytes).decode("utf-8")
+            # Move annotated image to top-level key — frontend saves it to RTDB separately
+            annotated_image_b64 = result.pop("annotated_image_base64", None)
+            if annotated_image_b64:
+                result["annotated_image_base64"] = annotated_image_b64
 
         return JSONResponse(content={"success": True, "result": result})
 
