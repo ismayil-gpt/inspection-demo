@@ -367,13 +367,18 @@ def run_analysis(
             missing_anns.append((ann, score))
 
     output = test_img.copy()
+    draw_quadrant_grid(output, img_w, img_h)
     for ann, score in found_anns:
-        draw_detection(output, ann, True,  score)
+        if ann.class_id != 6:
+            draw_detection(output, ann, True, score)
     for ann, score in missing_anns:
-        draw_detection(output, ann, False, score)
+        if ann.class_id != 6:
+            draw_detection(output, ann, False, score)
 
     all_issues: List[ComplianceIssue] = []
     all_issues.extend(check_rule1(detected, img_w, img_h))
+    for issue in all_issues:
+        draw_issue_highlight(output, issue)
     all_issues.extend(check_rule2(detected, output))
     all_issues.extend(check_rule3(detected))
 
