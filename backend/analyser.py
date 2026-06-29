@@ -19,8 +19,23 @@ def analyse_blueprint(file_bytes: bytes, file_type: str, form_data: dict) -> dic
     sub_type = (form_data.get("submission_type") or "").lower()
     if sub_type == "new_building":
         return _analyse_new_building_cv(file_bytes, file_type, form_data)
+    if sub_type == "shop_office":
+        return _analyse_shop_office(file_bytes, file_type, form_data)
 
     return _analyse_demo(form_data)
+
+
+# ──────────────────────────────────────────────────────
+# SHOP / OFFICE — OCR + keyword compliance engine
+# ──────────────────────────────────────────────────────
+def _analyse_shop_office(file_bytes: bytes, file_type: str, form_data: dict) -> dict:
+    try:
+        from shop_analyser import analyse_shop_office
+        return analyse_shop_office(file_bytes, file_type, form_data)
+    except Exception as e:
+        import traceback; traceback.print_exc()
+        print(f"[shop analyser] Falling back to demo mode: {e}")
+        return _analyse_demo(form_data)
 
 
 # ──────────────────────────────────────────────────────

@@ -1,0 +1,106 @@
+﻿{
+  "project_type": "shop_in_mall",
+  "analysis_type": "mock_floor_plan_image_precheck",
+  "generated_at": "2026-06-27T06:53:29.654872+00:00",
+  "input": {
+    "original_file": "C:\\Users\\ajuma\\Downloads\\Mall-Inspection-Demo-Floorplan.jpeg",
+    "stored_file": "storage\\mock_shop_mall_uploads\\baf1e952-f1fa-4e1b-b625-64f832208c25\\Mall-Inspection-Demo-Floorplan.jpeg",
+    "upload_id": "baf1e952-f1fa-4e1b-b625-64f832208c25",
+    "area_sqm": 96.0,
+    "mall_noc_uploaded": true
+  },
+  "image": {
+    "width_px": 1536,
+    "height_px": 1024,
+    "mode": "RGB",
+    "format": "JPEG"
+  },
+  "mall_shop_area": {
+    "area_sqm": 96.0,
+    "area_sqft": 1033.33,
+    "valid_for_demo": true,
+    "message": "Mall shop area is valid for this demo"
+  },
+  "detected_counts": {
+    "exit_signs": 4,
+    "emergency_lights": 2,
+    "fire_extinguishers": 2,
+    "fire_alarms": 4,
+    "smoke_detectors": 3,
+    "manual_call_points": 2,
+    "sprinklers": 13,
+    "drawing_scale_mentions": 1,
+    "legend_mentions": 1
+  },
+  "decision": {
+    "accepted": true,
+    "status": "Accepted",
+    "score": 100.0,
+    "confidence": 0.96,
+    "issues": []
+  },
+  "checklist": [
+    {
+      "id": "mall_shop_area_valid",
+      "label": "Mall shop area is valid for this demo",
+      "passed": true,
+      "critical": true
+    },
+    {
+      "id": "exit_signs_available",
+      "label": "Exit signs are available",
+      "passed": true,
+      "critical": true
+    },
+    {
+      "id": "emergency_lights_available",
+      "label": "Emergency lights are available",
+      "passed": true,
+      "critical": false
+    },
+    {
+      "id": "fire_extinguishers_shown",
+      "label": "Fire extinguishers are shown",
+      "passed": true,
+      "critical": true
+    },
+    {
+      "id": "smoke_detector_fire_alarm_points_shown",
+      "label": "Smoke detector/fire alarm points are shown",
+      "passed": true,
+      "critical": true
+    },
+    {
+      "id": "sprinkler_layout_shown",
+      "label": "Sprinkler layout is shown",
+      "passed": true,
+      "critical": false
+    },
+    {
+      "id": "drawing_scale_available",
+      "label": "Drawing scale is available",
+      "passed": true,
+      "critical": false
+    },
+    {
+      "id": "legend_symbols_available",
+      "label": "Legend/symbols are available",
+      "passed": true,
+      "critical": false
+    },
+    {
+      "id": "mall_noc_uploaded",
+      "label": "Mall NOC is uploaded",
+      "passed": true,
+      "critical": false
+    }
+  ],
+  "recommendations": [],
+  "annotated_image_path": null,
+  "annotations": [],
+  "ocr_text_excerpt": "LEGEND\nSPRINKLER HEAD (PENDENT)\n7 Eli SPRINKLER PIPE (BRANCH LINED\n, i 3} \u2014 _ SPRINKLER PIPE (MAIN LINE}\nian ic) 7] FRE ALARM CONTROL PANEL AGH)\non cme SPRINKLER WAIN IPE erore SMOKE DETECTOR\nHOP EN oe\nFRO eon \\ 2000 x 2500 G@ Heat peTecToR\nSee Ghana = Qe -@\u00ae [e] MANUAL CALL POINT (MCP)\n: ' @ FRE ALARM BELL\n: : FI wsunt warm strose\n3000 ' : : \u00a9 FIRE EXTINGUISHER (4.5 KG COp)\n: : 3 : RISER ROOM HOSE REEL\n' 5 : 2000 x 1500 Bx] care vaive\n: \u00a9 EWERGENCY UGHT\n: SHOP / RETAIL AREA ' fo) baO cur sen aeDy\n\u2018 i\n3 eintacee av FRERATED GOR\n3 ' (LIGHT HAZARD) : BZA FRERA\nwont \u00ae ooo SPRINLER DESIGN SURI Pn ome\n' : i \u2018DESIGN STANDARD UAE FIRE BLFE SAFETY CODE\n: : On Practice 2048\n' : DECUPANGT RETAIL (SHOP)\ni : : HAZARO CLASERICATION | UGHT HAZARD\n: : \u2018DESIGN DENT 2:8 Fin\n' \u2018 \u2018 \"AREA OF OPERATION 12,0608",
+  "warnings": [
+    "This is a mock heuristic analysis, not final DCD approval.",
+    "Symbol counts are based on OCR/filename hints until a trained vision model is connected."
+  ]
+}

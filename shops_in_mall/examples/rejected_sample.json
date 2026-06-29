@@ -1,0 +1,164 @@
+﻿{
+  "project_type": "shop_in_mall",
+  "analysis_type": "mock_floor_plan_image_precheck",
+  "generated_at": "2026-06-27T06:53:31.205613+00:00",
+  "input": {
+    "original_file": "C:\\Users\\ajuma\\Downloads\\Mall-Inspection-Demo-3.png",
+    "stored_file": "storage\\mock_shop_mall_uploads\\05bca16e-eb98-4f5b-a005-f84e946225ab\\Mall-Inspection-Demo-3.png",
+    "upload_id": "05bca16e-eb98-4f5b-a005-f84e946225ab",
+    "area_sqm": 96.0,
+    "mall_noc_uploaded": true
+  },
+  "image": {
+    "width_px": 1535,
+    "height_px": 1024,
+    "mode": "RGB",
+    "format": "PNG"
+  },
+  "mall_shop_area": {
+    "area_sqm": 96.0,
+    "area_sqft": 1033.33,
+    "valid_for_demo": true,
+    "message": "Mall shop area is valid for this demo"
+  },
+  "detected_counts": {
+    "exit_signs": 0,
+    "emergency_lights": 0,
+    "fire_extinguishers": 0,
+    "fire_alarms": 5,
+    "smoke_detectors": 4,
+    "manual_call_points": 1,
+    "sprinklers": 10,
+    "drawing_scale_mentions": 1,
+    "legend_mentions": 1
+  },
+  "decision": {
+    "accepted": false,
+    "status": "Rejected",
+    "score": 66.67,
+    "confidence": 0.75,
+    "issues": [
+      {
+        "item_id": "exit_signs_available",
+        "message": "Exit signs are available",
+        "priority": "Critical"
+      },
+      {
+        "item_id": "emergency_lights_available",
+        "message": "Emergency lights are available",
+        "priority": "Review"
+      },
+      {
+        "item_id": "fire_extinguishers_shown",
+        "message": "Fire extinguishers are shown",
+        "priority": "Critical"
+      }
+    ]
+  },
+  "checklist": [
+    {
+      "id": "mall_shop_area_valid",
+      "label": "Mall shop area is valid for this demo",
+      "passed": true,
+      "critical": true
+    },
+    {
+      "id": "exit_signs_available",
+      "label": "Exit signs are available",
+      "passed": false,
+      "critical": true
+    },
+    {
+      "id": "emergency_lights_available",
+      "label": "Emergency lights are available",
+      "passed": false,
+      "critical": false
+    },
+    {
+      "id": "fire_extinguishers_shown",
+      "label": "Fire extinguishers are shown",
+      "passed": false,
+      "critical": true
+    },
+    {
+      "id": "smoke_detector_fire_alarm_points_shown",
+      "label": "Smoke detector/fire alarm points are shown",
+      "passed": true,
+      "critical": true
+    },
+    {
+      "id": "sprinkler_layout_shown",
+      "label": "Sprinkler layout is shown",
+      "passed": true,
+      "critical": false
+    },
+    {
+      "id": "drawing_scale_available",
+      "label": "Drawing scale is available",
+      "passed": true,
+      "critical": false
+    },
+    {
+      "id": "legend_symbols_available",
+      "label": "Legend/symbols are available",
+      "passed": true,
+      "critical": false
+    },
+    {
+      "id": "mall_noc_uploaded",
+      "label": "Mall NOC is uploaded",
+      "passed": true,
+      "critical": false
+    }
+  ],
+  "recommendations": [
+    {
+      "item_id": "exit_signs_available",
+      "reason": "Exit signs are available",
+      "recommendation": "Add illuminated exit signage at required exits and update the life-safety drawing.",
+      "priority": "Critical"
+    },
+    {
+      "item_id": "emergency_lights_available",
+      "reason": "Emergency lights are available",
+      "recommendation": "Add emergency lighting coverage to escape paths and coordinate it with exit signage.",
+      "priority": "High"
+    },
+    {
+      "item_id": "fire_extinguishers_shown",
+      "reason": "Fire extinguishers are shown",
+      "recommendation": "Show fire extinguisher locations on the plan and include them in the legend.",
+      "priority": "Critical"
+    }
+  ],
+  "annotated_image_path": "storage\\mock_shop_mall_uploads\\05bca16e-eb98-4f5b-a005-f84e946225ab\\annotated_Mall-Inspection-Demo-3.png",
+  "annotations": [
+    {
+      "item_id": "fire_extinguishers_shown",
+      "label": "Add fire extinguisher",
+      "recommendation": "Show fire extinguisher locations on the plan and include them in the legend.",
+      "priority": "Critical",
+      "shape": "circle",
+      "x": 583,
+      "y": 143,
+      "radius": 30,
+      "note": "Add fire extinguisher near the main mall corridor entrance"
+    },
+    {
+      "item_id": "fire_extinguishers_shown",
+      "label": "Add fire extinguisher",
+      "recommendation": "Show fire extinguisher locations on the plan and include them in the legend.",
+      "priority": "Critical",
+      "shape": "circle",
+      "x": 706,
+      "y": 655,
+      "radius": 30,
+      "note": "Add fire extinguisher near the secondary mall corridor exit"
+    }
+  ],
+  "ocr_text_excerpt": "LEGEND\n\n\u2018SPRINKLER HEAD (PENDENT)\n\u2018SPRINKLER PIPE (BRANCH LINE)\n\u2018SPRINKLER PIPE (MAIN LINE)\n\n7 @ F] FIRE ALARM CONTROL PANEL (FRCP)\nyo SPRINKLER MAN PPE\n28mm 9 STORE @\u00ae SMOKE DETECTOR\n2000 x 2500 @ \u2014 REATDeTECTOR\n\u00ae [eo] MANUAL CALL POINT (cry\nt @ FRE ALARM BELL\n: CA wouns assur srmose\ni\n; \u00ae \u2014 wose ree\n1\ng i RISER ROOM \u00a9  voseren.\n4 2000 x 1500 Del GATE valve\ni \u00a9 EWERGENCY UGHT\nSHOP / RETAIL AREA ! LY Ono\n96.00 SQ.M. 1 Qrxl EAT'SIGN (LED)\n3 TT HAZAR i 6x. EEE FIRE RATED DOOR\n3 (LIGHT HAZARD) \\ a\n@ SPRINKLER DESIGN SUMMARY (AS PER LAE CODE)\n' ' DESGNTANORRD GnE FRE Ue eAPETY CODE\ni : Oe PRACTICE 2018\n' H ecUPANCY ETAL (SHOP)\n: : HAZARD CLASSIFICATION [LIGHT HAZARD\n! ! DESIGN OENSITY 2.3 ran in\nHl j [AREA OF OPERATION 720 600.\n! : SPRIMLER TIPE PENDENT\n! ' RESPONSE TYPE  STANOARE RESPONSE\n@ S",
+  "warnings": [
+    "This is a mock heuristic analysis, not final DCD approval.",
+    "Symbol counts are based on OCR/filename hints until a trained vision model is connected."
+  ]
+}
